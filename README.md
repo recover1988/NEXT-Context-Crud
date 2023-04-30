@@ -20,17 +20,54 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## File System
 
-To learn more about Next.js, take a look at the following resources:
+En la carpeta `app` se genera la estrutura de la aplicacion mediante carpetas que a su vez necesitan un archivo llamando page.js o .ts para indicar que se trata de una pagina.
+Para indicar que se espera informacion dinamica por url usamos una carpeta que en su nombre tenga entre corchetes la info que necesitamos como [id]:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+/app/edit/[id]/page.js   <--
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+const Page = ({ params }) => {
+  return (
+    <div>
+      editando
+      <h3>{params.id}</h3>
+    </div>
+  );
+};
 
-## Deploy on Vercel
+export default Page;
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Los componentes o paginas en este caso reciben por `props` en la propiedad `params` la informacion que se envia por la url con su nombre en este caso `id`.
+
+## Context
+
+Para usar el contexto primero necesitamos generar el contexto mediante el `createContext` que se importa de react, luego creamos el provider para compartir el contexto a los children y por ultimo usamos el hook personalizado para poder acceder a la informacion desde los componentes.
+
+```
+"use client";
+import { createContext, useContext } from "react";
+
+// Creando un Contexto
+export const TaskContext = createContext();
+
+// Provider por el cual se pasa el contexto a los childrens
+export const TaskProvider = ({ children }) => {
+    const tasks = [];
+    return (
+        <TaskContext.Provider value={{tasks}}>{children}</TaskContext.Provider>
+    );
+};
+
+// Hook personalizado para usar el contexto en los componentes
+export const useTasks = () => {
+    const context = useContext(TaskContext);
+    if (!context) throw new Error("useTasks must used within a provider");
+    return context;
+};
+```
+
+Se usa la etiqueta 'use client' para indicar que se genera del lado del cliente y no desde el servidor.
