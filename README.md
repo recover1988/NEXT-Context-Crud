@@ -266,3 +266,86 @@ Esta la usamos en el botton mediante una funcion en el onClick y usamos el metod
                 Delete
             </button>
 ```
+
+## Actualizar Tarea
+
+Para usar la misma pagina del formulario podemos importarla y exportarla en la el archivo que esta en la carpeta de edit.
+
+```
+import NewFormPage from "../../new/page";
+export default NewFormPage;
+
+```
+
+De esta forma reutilizamos codigo y solo modificamos el formulario con condicionales.
+
+Creamos la funcion que modiifque el contexto mediante el id y pasandole las propiedades a modificar:
+
+```
+    // Funcion para actualizar una tarea
+    const updateTask = (id, newData) => {
+        setTasks([
+            ...tasks.map((task) =>
+                task.id === id ? { ...task, ...newData } : task
+            ),
+        ]);
+    };
+```
+
+En el formulario agregamos condificiones para cuando la ruta llegue el params de id:
+
+```
+"use client";
+
+import { useTasks } from "@/context/TaskContext";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+const Page = ({ params }) => {
+    const router = useRouter();
+    const [task, setTask] = useState({
+        title: "",
+        description: "",
+    });
+    const { createTask, tasks, updateTask } = useTasks();
+
+    const handleChange = (e) => {
+        setTask((state) => ({
+            ...state,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (params.id) {
+            updateTask(params.id, task);
+        } else {
+            createTask(task.title, task.description);
+        }
+        router.push("/");
+    };
+
+    useEffect(() => {
+        if (params.id) {
+            const taskFound = tasks.find(
+                (task) => task.id.toString() === params.id
+            );
+            if (taskFound)
+                setTask({
+                    title: taskFound.title,
+                    description: taskFound.description,
+                });
+        }
+    }, []);
+
+    return (
+        ...........
+        ...........
+        ...........
+    )
+};
+export default Page;
+```
+
+Mediante un useEffect buscamos la terea con el id del params si existe y luego lo llenamos en el formulario pasandole los valores.
