@@ -31,7 +31,7 @@ export const TaskProvider = ({ children }) => {
             description: "some task",
         },
     ]);
-
+    // Funcion para agregar la nueva tarea al contexto
     const createTask = (title, description) => {
         setTasks([...tasks, { title, description, id: uuid() }]);
     };

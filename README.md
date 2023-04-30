@@ -127,3 +127,115 @@ const TaskCard = ({ task }) => {
 
 export default TaskCard;
 ```
+
+## Crear Task
+
+Para crear una tarea necesitamos tener el formulario, este maneja un estado donde se guarda toda la info.
+Durante el submit se llama una funcion que agregar la tarea al arreglo creado en el contexto.
+De el contexto debemos tener una funcion que simplemente agregar la nueva tarea a la funcion para ello creamos un state que maneje lo cambios. Y lo pasamos en el objeto que se comparte del contexto.
+
+```
+"use client";
+import { createContext, useContext, useState } from "react";
+import { v4 as uuid } from "uuid";
+
+// Creando un Contexto
+export const TaskContext = createContext();
+
+// Hook personalizado para usar el contexto en los componentes
+export const useTasks = () => {
+    const context = useContext(TaskContext);
+    if (!context) throw new Error("useTasks must used within a provider");
+    return context;
+};
+
+// Provider por el cual se pasa el contexto a los childrens
+export const TaskProvider = ({ children }) => {
+    const [tasks, setTasks] = useState([
+        {
+            id: 1,
+            title: "my first task",
+            description: "some task",
+        },
+        {
+            id: 2,
+            title: "my second task",
+            description: "some task",
+        },
+        {
+            id: 3,
+            title: "my third task",
+            description: "some task",
+        },
+    ]);
+
+    // Funcion para agregar la nueva tarea al contexto
+    const createTask = (title, description) => {
+        setTasks([...tasks, { title, description, id: uuid() }]);
+    };
+    return (
+        <TaskContext.Provider value={{ tasks, createTask }}>
+            {children}
+        </TaskContext.Provider>
+    );
+};
+
+```
+
+En el formulario usamos un estado para manejar los cambios mediante un objeto que iniciamos vacio y que luego actualizaremos mediante un set.
+
+```
+"use client";
+
+import { useTasks } from "@/context/TaskContext";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+const Page = () => {
+    const router = useRouter();
+    const [task, setTask] = useState({});
+    const { createTask } = useTasks();
+
+    const handleChange = (e) => {
+        setTask((state) => ({
+            ...state,
+            [e.target.name]: e.target.value,
+        }));
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        createTask(task.title, task.description);
+        router.push("/");
+    };
+    return (
+        <div className="w-full max-w-xs m-auto mt-10 items-center">
+            <form
+                className="bg-slate-700 shadow-lg rounded px-8 pt-6 pb-8 mb-4"
+                onSubmit={handleSubmit}
+            >
+                <input
+                    className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
+                    placeholder="Write a title"
+                    name="title"
+                    onChange={(e) => handleChange(e)}
+                />
+                <textarea
+                    className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
+                    placeholder="Write a description"
+                    name="description"
+                    onChange={handleChange}
+                />
+                <br />
+                <button
+                    className="w-full rounded-md uppercase cursor-pointer bg-green-700"
+                    type="submit"
+                >
+                    Save
+                </button>
+            </form>
+        </div>
+    );
+};
+
+export default Page;
+```
