@@ -6,9 +6,27 @@ export const TaskContext = createContext();
 
 // Provider por el cual se pasa el contexto a los childrens
 export const TaskProvider = ({ children }) => {
-    const tasks = [];
+    const tasks = [
+        {
+            id: 1,
+            title: "my first task",
+            description: "some task",
+        },
+        {
+            id: 2,
+            title: "my second task",
+            description: "some task",
+        },
+        {
+            id: 3,
+            title: "my third task",
+            description: "some task",
+        },
+    ];
     return (
-        <TaskContext.Provider value={{tasks}}>{children}</TaskContext.Provider>
+        <TaskContext.Provider value={{ tasks }}>
+            {children}
+        </TaskContext.Provider>
     );
 };
 

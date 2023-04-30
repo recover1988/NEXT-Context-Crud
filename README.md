@@ -71,3 +71,59 @@ export const useTasks = () => {
 ```
 
 Se usa la etiqueta 'use client' para indicar que se genera del lado del cliente y no desde el servidor.
+
+## Listar Tareas
+
+Para crear un listado de tareas pedimos la info desde el contexto y luego usamos un `map` para renderizar las tareas mediante un componente al cual se le pasa por props la info de cada tarea.
+
+```
+"use client";
+import TaskCard from "@/components/TaskCard";
+import { useTasks } from "@/context/TaskContext";
+import React from "react";
+
+const Page = () => {
+    const { tasks } = useTasks();
+    return (
+        <div>
+            {tasks.map((task) => (
+                <TaskCard
+                    task={task}
+                    key={task.id}
+                />
+            ))}
+        </div>
+    );
+};
+
+export default Page;
+```
+
+Los componentes de la lista deben tener su propia `key` que no debe ser duplicada.
+
+Dentro del componente `TaskCard` podemos usar el `useRouter` pero desde navigation, para poders redirigir a la pagina de la tarea mediante el `router.push`
+
+```
+import { useRouter } from "next/navigation";
+import React from "react";
+
+const TaskCard = ({ task }) => {
+    const router = useRouter();
+    return (
+        <div
+            className="bg-slate-800 text-green-300 text-sm w-80 h-auto m-5 rounded-lg p-5 cursor-pointer"
+            onClick={() => router.push(`/edit/${task.id}`)}
+        >
+            <h1 className="uppercase text-lg font-bold">{task.title}</h1>
+            <button className="bg-red-700 text-green-50 p-1 rounded-xl w-20">
+                Delete
+            </button>
+            <p className="first-letter:uppercase text-green-500 font-mono h-20">
+                {task.description}
+            </p>
+        </div>
+    );
+};
+
+export default TaskCard;
+```
