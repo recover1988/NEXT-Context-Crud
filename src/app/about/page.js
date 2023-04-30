@@ -1,9 +1,11 @@
-import React from 'react'
+"use client";
+import { useContext } from "react";
+import { useTasks } from "../../context/TaskContext";
 
 const page = () => {
-  return (
-    <div>About page</div>
-  )
-}
+    const {tasks} = useTasks();
+    console.log(tasks);
+    return <div>About page</div>;
+};
 
-export default page
+export default page;
