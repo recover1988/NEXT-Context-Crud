@@ -16,27 +16,44 @@ export const useTasks = () => {
 export const TaskProvider = ({ children }) => {
     const [tasks, setTasks] = useState([
         {
-            id: 1,
+            id: "1",
             title: "my first task",
             description: "some task",
         },
         {
-            id: 2,
+            id: "2",
             title: "my second task",
             description: "some task",
         },
         {
-            id: 3,
+            id: "3",
             title: "my third task",
             description: "some task",
         },
     ]);
+
     // Funcion para agregar la nueva tarea al contexto
     const createTask = (title, description) => {
         setTasks([...tasks, { title, description, id: uuid() }]);
     };
+
+    // Funcion para borrar una tarea
+    const deleteTask = (id) => {
+        setTasks([...tasks.filter((task) => task.id !== id)]);
+    };
+
+    // Funcion para actualizar una tarea
+    const updateTask = (id, newData) => {
+        setTasks([
+            ...tasks.map((task) =>
+                task.id === id ? { ...task, ...newData } : task
+            ),
+        ]);
+    };
     return (
-        <TaskContext.Provider value={{ tasks, createTask }}>
+        <TaskContext.Provider
+            value={{ tasks, createTask, deleteTask, updateTask }}
+        >
             {children}
         </TaskContext.Provider>
     );

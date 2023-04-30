@@ -239,3 +239,30 @@ const Page = () => {
 
 export default Page;
 ```
+
+## Eliminar Tarea
+
+Para eliminar debemos tener una funcion en el contexto que elimine mediante el id la tarea:
+
+```
+    // Funcion para borrar una tarea
+    const deleteTask = (id) => {
+        setTasks([...tasks.filter((task) => task.id !== id)]);
+    };
+```
+
+Esta la usamos en el botton mediante una funcion en el onClick y usamos el metodo del evento `stopPropagation()` para que no se ejecuta el redireccionamiento.
+
+```
+  <button
+                type="button"
+                className="bg-red-700 text-green-50 p-1 rounded-xl w-20"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    const accept = window.confirm("Are you sure?");
+                    if (accept) deleteTask(task.id);
+                }}
+            >
+                Delete
+            </button>
+```

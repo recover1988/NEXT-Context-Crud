@@ -2,12 +2,15 @@
 
 import { useTasks } from "@/context/TaskContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const Page = () => {
+const Page = ({ params }) => {
     const router = useRouter();
-    const [task, setTask] = useState({});
-    const { createTask } = useTasks();
+    const [task, setTask] = useState({
+        title: "",
+        description: "",
+    });
+    const { createTask, tasks, updateTask } = useTasks();
 
     const handleChange = (e) => {
         setTask((state) => ({
@@ -15,11 +18,30 @@ const Page = () => {
             [e.target.name]: e.target.value,
         }));
     };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        createTask(task.title, task.description);
+        if (params.id) {
+            updateTask(params.id, task);
+        } else {
+            createTask(task.title, task.description);
+        }
         router.push("/");
     };
+
+    useEffect(() => {
+        if (params.id) {
+            const taskFound = tasks.find(
+                (task) => task.id.toString() === params.id
+            );
+            if (taskFound)
+                setTask({
+                    title: taskFound.title,
+                    description: taskFound.description,
+                });
+        }
+    }, []);
+
     return (
         <div className="w-full max-w-xs m-auto mt-10 items-center">
             <form
@@ -30,12 +52,14 @@ const Page = () => {
                     className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
                     placeholder="Write a title"
                     name="title"
+                    value={task.title}
                     onChange={(e) => handleChange(e)}
                 />
                 <textarea
                     className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
                     placeholder="Write a description"
                     name="description"
+                    value={task.description}
                     onChange={handleChange}
                 />
                 <br />
