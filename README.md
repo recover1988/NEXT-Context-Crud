@@ -349,3 +349,5 @@ export default Page;
 ```
 
 Mediante un useEffect buscamos la terea con el id del params si existe y luego lo llenamos en el formulario pasandole los valores.
+
+## LocalStorage

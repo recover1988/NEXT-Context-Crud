@@ -1,5 +1,6 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import { useLocalStorage } from "@/hooks/useLocalstorage";
+import { createContext, useContext, useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
 // Creando un Contexto
@@ -14,23 +15,7 @@ export const useTasks = () => {
 
 // Provider por el cual se pasa el contexto a los childrens
 export const TaskProvider = ({ children }) => {
-    const [tasks, setTasks] = useState([
-        {
-            id: "1",
-            title: "my first task",
-            description: "some task",
-        },
-        {
-            id: "2",
-            title: "my second task",
-            description: "some task",
-        },
-        {
-            id: "3",
-            title: "my third task",
-            description: "some task",
-        },
-    ]);
+    const [tasks, setTasks] = useLocalStorage("tasks", []);
 
     // Funcion para agregar la nueva tarea al contexto
     const createTask = (title, description) => {
@@ -50,6 +35,7 @@ export const TaskProvider = ({ children }) => {
             ),
         ]);
     };
+
     return (
         <TaskContext.Provider
             value={{ tasks, createTask, deleteTask, updateTask }}
