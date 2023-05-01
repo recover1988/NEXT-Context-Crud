@@ -351,3 +351,30 @@ export default Page;
 Mediante un useEffect buscamos la terea con el id del params si existe y luego lo llenamos en el formulario pasandole los valores.
 
 ## LocalStorage
+
+Para llenar un state con info del localstorage tenemos que hacerlo mediante un useEffect, para ello podemos crear un hook personalizado:
+
+```
+import { useEffect, useState } from "react";
+
+export function useLocalStorage(key, initialState) {
+    const [state, setState] = useState(initialState);
+
+    useEffect(() => {
+        const item = localStorage.getItem(key);
+        const tasks = JSON.parse(item);
+        if (tasks) setState(tasks);
+    }, []);
+
+    useEffect(() => {
+        if (state.length > 0) {
+            localStorage.setItem(key, JSON.stringify(state));
+        }
+    }, [state, setState]);
+
+    return [state, setState];
+}
+
+```
+
+Este hook necesita una key y un estado inicial, ademas usa dos usEffect uno para llenar el estado si hay info y otra para actualizar el storage.
