@@ -3,42 +3,34 @@
 import { useTasks } from "@/context/TaskContext";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 const Page = ({ params }) => {
-    const router = useRouter();
-    const [task, setTask] = useState({
-        title: "",
-        description: "",
-    });
     const { createTask, tasks, updateTask } = useTasks();
+    const router = useRouter();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+    } = useForm();
 
-    const handleChange = (e) => {
-        setTask((state) => ({
-            ...state,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = handleSubmit((data) => {
         if (params.id) {
-            updateTask(params.id, task);
+            updateTask(params.id, data);
         } else {
-            createTask(task.title, task.description);
+            createTask(data.title, data.description);
         }
         router.push("/");
-    };
+    });
 
     useEffect(() => {
         if (params.id) {
-            const taskFound = tasks.find(
-                (task) => task.id.toString() === params.id
-            );
-            if (taskFound)
-                setTask({
-                    title: taskFound.title,
-                    description: taskFound.description,
-                });
+            const taskFound = tasks.find((task) => task.id === params.id);
+            if (taskFound) {
+                setValue("title", taskFound.title);
+                setValue("description", taskFound.description);
+            }
         }
     }, []);
 
@@ -46,23 +38,28 @@ const Page = ({ params }) => {
         <div className="w-full max-w-xs m-auto mt-10 items-center">
             <form
                 className="bg-slate-700 shadow-lg rounded px-8 pt-6 pb-8 mb-4"
-                onSubmit={handleSubmit}
+                onSubmit={onSubmit}
             >
                 <input
-                    className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
+                    className="block bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
                     placeholder="Write a title"
-                    name="title"
-                    value={task.title}
-                    onChange={(e) => handleChange(e)}
+                    {...register("title", { required: true })}
                 />
+                {errors.title && (
+                    <div className="relative bottom-4 text-pink-600 font-medium text-xs ">
+                        this field is required
+                    </div>
+                )}
                 <textarea
-                    className="bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
+                    className="block bg-slate-600 rounded-md px-3 py-2 mb-5 w-full"
                     placeholder="Write a description"
-                    name="description"
-                    value={task.description}
-                    onChange={handleChange}
+                    {...register("description", { required: true })}
                 />
-                <br />
+                {errors.description && (
+                    <span className="relative bottom-4 text-pink-600 font-medium text-xs">
+                        this field is required
+                    </span>
+                )}
                 <button
                     className="w-full rounded-md uppercase cursor-pointer bg-green-700"
                     type="submit"
